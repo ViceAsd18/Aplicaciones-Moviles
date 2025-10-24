@@ -1,32 +1,23 @@
 package com.example.alpha_mobile.navigation
 
-import RegistroScreen
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
-
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.alpha_mobile.view.ResumenScreen
-import com.example.alpha_mobile.viewmodel.UsuarioViewModel
+import com.example.alpha_mobile.view.screens.*
 
 @Composable
-fun AppNavigation(){
-    val navController = rememberNavController()
-
-    val usuarioViewModel : UsuarioViewModel = viewModel()
-
+fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "registro"
+        startDestination = Screen.Login.route
     ) {
-        composable("registro"){
-            RegistroScreen(navController, usuarioViewModel)
-        }
+        composable(Screen.Login.route) { LoginScreen(navController) }
+        composable(Screen.Registro.route) { RegistroScreen(navController) }
+        composable(Screen.Home.route) { HomeScreen(navController) }
 
-        composable("resumen"){
-            ResumenScreen(usuarioViewModel)
-        }
+        composable(Screen.Perfil.route) { ProfileScreen(navController) }
+        composable(Screen.Configuracion.route) { SettingsScreen(navController) }
+        composable(Screen.Principal.route) { PantallaPrincipal(navController) }
     }
-
 }

@@ -1,12 +1,16 @@
+package com.example.alpha_mobile.navigation
+
 sealed class Screen(val route: String) {
 
-    data object Home : Screen("home_page")
-    data object Profile : Screen("profile_page")
-    data object Settings : Screen("settings_page")
+    data object Login : Screen("login")
+    data object Registro : Screen("registro")
+    data object Home : Screen("home")
 
-    data class Detail(val itemId: String) : Screen("detail_page/{itemId}") {
-        fun buildRoute(): String {
-            return route.replace("{itemId}", itemId)
-        }
+    data object Perfil : Screen("perfil")
+    data object Configuracion : Screen("configuracion")
+    data object Principal : Screen("principal")
+
+    data class Detalle(val itemId: String) : Screen("detalle/{itemId}") {
+        fun buildRoute(): String = "detalle/$itemId"
     }
 }

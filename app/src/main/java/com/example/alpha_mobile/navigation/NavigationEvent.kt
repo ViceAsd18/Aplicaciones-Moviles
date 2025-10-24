@@ -1,17 +1,16 @@
 package com.example.alpha_mobile.navigation
-import Screen
+
 
 sealed class NavigationEvent {
 
-    data class NavigateTo (
-        val route : Screen,
-        val popUpToRoute : Screen? = null,
-        val inclusive : Boolean = false,
-        val singleTop : Boolean = false
+    data class NavigateTo(
+        val route: Screen,
+        val popUpToRoute: Screen? = null,
+        val inclusive: Boolean = false,
+        val singleTop: Boolean = false
     ) : NavigationEvent()
 
     object PopBackStack : NavigationEvent()
 
     object NavigateUp : NavigationEvent()
-
 }
