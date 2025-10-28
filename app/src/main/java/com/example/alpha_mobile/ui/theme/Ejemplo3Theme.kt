@@ -1,12 +1,13 @@
-package com.example.alpha_mobile.view.theme
+package com.example.alpha_mobile.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-val DefaultTypography = androidx.compose.material3.Typography()
-val DefaultShapes = androidx.compose.material3.Shapes()
+val DefaultTypography = Typography()
+val DefaultShapes = Shapes()
 
 @Composable
 fun Ejemplo3Theme(

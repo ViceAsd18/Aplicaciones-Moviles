@@ -4,20 +4,36 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.alpha_mobile.view.screens.*
+import com.example.alpha_mobile.views.BarraNavegacion
+import com.example.alpha_mobile.views.DetalleProductoScreen
+import com.example.alpha_mobile.views.LoginScreen
+import com.example.alpha_mobile.views.RegistroScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+
+    //Los "navController" controla las rutas.
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route
+        startDestination = "login" //indica la primera pantalla que se muestra al abrir la app.
     ) {
-        composable(Screen.Login.route) { LoginScreen(navController) }
-        composable(Screen.Registro.route) { RegistroScreen(navController) }
-        composable(Screen.Home.route) { HomeScreen(navController) }
+        composable("login") {
+            LoginScreen(navController)
+        }
+        composable("registro") {
+            RegistroScreen(navController)
+        }
+        composable("home") {
+            BarraNavegacion(navController)
+        }
 
-        composable(Screen.Perfil.route) { ProfileScreen(navController) }
-        composable(Screen.Configuracion.route) { SettingsScreen(navController) }
-        composable(Screen.Principal.route) { PantallaPrincipal(navController) }
+        // Usa un argumento dinámico {id} para identificar el producto seleccionado.
+        composable("detalle/{id}") { backStackEntry ->
+            // Obtiene el parámetro "id" desde la ruta.
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull() ?: 0
+            // Muestra el detalle del producto seleccionado.
+            DetalleProductoScreen(navController, id)
+        }
+
     }
 }

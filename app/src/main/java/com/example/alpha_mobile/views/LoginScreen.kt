@@ -1,39 +1,38 @@
-package com.example.alpha_mobile.view.screens
+package com.example.alpha_mobile.views
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.alpha_mobile.data.EstadoDataStore
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import com.example.alpha_mobile.viewmodel.LoginViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
+) {
     val context = LocalContext.current
-    val dataStore = remember { EstadoDataStore(context) }
-    val scope = rememberCoroutineScope()
 
-    var correo by rememberSaveable { mutableStateOf("") }
-    var clave by rememberSaveable { mutableStateOf("") }
-    var cargando by rememberSaveable { mutableStateOf(false) }
-    var error by rememberSaveable { mutableStateOf<String?>(null) }
+    //Estados desde el ViewModel
+    val correo by viewModel.correo.collectAsState()
+    val clave by viewModel.clave.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val cargando by viewModel.cargando.collectAsState()
+    val sesionActiva by viewModel.sesionActiva.collectAsState()
 
-    //Si ya hay sesión activa, ir directo al home
-    LaunchedEffect(Unit) {
-        dataStore.obtenerSesionActiva().collectLatest { activa ->
-            if (activa) {
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
+    //Navegar al tiro al Home si hay una sesión activa
+    LaunchedEffect(sesionActiva) {
+        if (sesionActiva) {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
             }
         }
     }
@@ -50,25 +49,26 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            //Título principal
             Text("Iniciar sesión en GameZone", style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(24.dp))
 
+            //Campo para el correo
             OutlinedTextField(
                 value = correo,
-                onValueChange = { correo = it },
+                onValueChange = viewModel::onCorreoChange,
                 label = { Text("Correo @duoc.cl") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                )
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
 
             Spacer(Modifier.height(8.dp))
 
+            //Campo para la contraseña
             OutlinedTextField(
                 value = clave,
-                onValueChange = { clave = it },
+                onValueChange = viewModel::onClaveChange,
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
@@ -77,7 +77,7 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(Modifier.height(16.dp))
 
-            //Mensaje de error
+            // Mensaje de error
             error?.let {
                 Text(
                     it,
@@ -87,41 +87,13 @@ fun LoginScreen(navController: NavController) {
                 Spacer(Modifier.height(8.dp))
             }
 
-            //Botón principal
+            //Botón de inicio de sesion
             Button(
-                onClick = {
-                    error = null
-
-                    // Validaciones básicas
-                    if (correo.isBlank() || clave.isBlank()) {
-                        error = "Completa correo y contraseña"
-                        return@Button
-                    }
-                    if (!correo.matches(Regex("^[A-Za-z0-9._%+-]+@duoc\\.cl$"))) {
-                        error = "Debe ser un correo válido @duoc.cl"
-                        return@Button
-                    }
-                    if (clave.length < 10) {
-                        error = "La contraseña debe tener al menos 10 caracteres"
-                        return@Button
-                    }
-
-                    cargando = true
-                    scope.launch {
-                        // ⚙️ Simulación de autenticación local (sin backend)
-                        kotlinx.coroutines.delay(400)
-                        dataStore.guardarUsuario(correo.trim(), true)
-                        cargando = false
-
-                        navController.navigate("home") {
-                            popUpTo("login") { inclusive = true }
-                        }
-                    }
-                },
+                onClick = { viewModel.login() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = !cargando
+                enabled = !cargando //se desactiva mientras carga
             ) {
                 if (cargando) {
                     CircularProgressIndicator(
